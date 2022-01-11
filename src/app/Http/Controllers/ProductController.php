@@ -29,17 +29,39 @@ class ProductController extends Controller
        ]);
 
 
-       $collection = $response->collect();
-
-       $filtered = $collection->map(function ($item, $key) {
-             $item =  collect($item);  
-             $item->put('price_BRL', $this->convertCurrency($item['price'], $item['currency'], 'BRL'));
-             return $item->only(['name','price','price_BRL','description']);
-        });
-
-
-        return $filtered->all();
+        return $this->filteredCollection($response->collect())->all();
        
+    }
+
+
+    public function brands($brand)
+    {
+        $response = Http::get($this->endpoint,[
+            'brand' => $brand
+       ]);
+
+
+        $collection =  $response->collect();
+
+        $brands = [
+           'cheapest' =>  $this->filteredCollection($collection->where('price', $collection->min('price'))),
+           'mostExpensive' =>  $this->filteredCollection($collection->where('price', $collection->max('price')))    
+
+
+        ];
+       
+
+        return $brands;
+    }
+
+
+    private function filteredCollection($collection) 
+    {
+        return $collection->map(function ($item, $key) {
+            $item =  collect($item);  
+            $item->put('price_BRL', $this->convertCurrency($item['price'], $item['currency'], 'BRL'));
+            return $item->only(['name','price','price_BRL','description']);
+        });
     }
 
 
@@ -59,13 +81,12 @@ class ProductController extends Controller
                 ],
             ]);
 
-            return $response->collect()['result'][$toCurrency];            
+            return $response->collect()['result'][$toCurrency];
             
         }
         
 
-        return 0.0;    
-
+        return 0.0;
         
     }
 
