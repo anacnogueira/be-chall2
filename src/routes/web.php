@@ -22,4 +22,5 @@ $router->group(['prefix' => 'healthz'], function () use ($router) {
 $router->group(['prefix' => 'product'], function () use ($router) {
     $router->get('/search/{type}/{category}', 'ProductController@search');
     $router->get('/brands/{brand}', 'ProductController@brands');
+    $router->post('/buy', 'ProductController@buy');
 });

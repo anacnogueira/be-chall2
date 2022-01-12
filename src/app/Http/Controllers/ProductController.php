@@ -3,21 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request;
+use App\Models\Transaction;
 
 
 class ProductController extends Controller
 {
     
     private $endpoint;
+    private $transaction;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Transaction $transaction)
     {
         $this->endpoint = "http://makeup-api.herokuapp.com/api/v1/products.json";
+        $this->transaction = $transaction;
     }
 
     public function search($type, $category)
@@ -54,6 +58,14 @@ class ProductController extends Controller
         return $brands;
     }
 
+    public function buy(Request $request)
+    {
+
+        $transaction = $this->transaction->create([
+             $request->all();
+        ]);
+    }
+
 
     private function filteredCollection($collection) 
     {
@@ -86,8 +98,7 @@ class ProductController extends Controller
         }
         
 
-        return 0.0;
-        
+        return 0.0;        
     }
 
 }
